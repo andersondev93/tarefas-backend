@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 
 
 app.use(cors({
-    origin: ['https://seu-frontend.vercel.app', 'http://localhost:3000']
+    origin: ['https://tarefas-frontend-bice.vercel.app/', 'http://localhost:3000']
 }));
 app.use(express.json());
 
