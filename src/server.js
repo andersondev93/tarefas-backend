@@ -8,8 +8,10 @@ const prisma = new PrismaClient();
 
 
 app.use(cors({
-    origin: ['https://tarefas-frontend-bice.vercel.app/', 'http://localhost:3000']
-}));
+    origin: ['https://tarefas-frontend-bice.vercel.app', 'http://localhost:3000'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+    credentials: true
+  }));
 app.use(express.json());
 
 // Criar uma tarefa
