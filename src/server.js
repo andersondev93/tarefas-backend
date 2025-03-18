@@ -7,7 +7,9 @@ const app = express();
 const prisma = new PrismaClient();
 
 
-app.use(cors());
+app.use(cors({
+    origin: ['https://seu-frontend.vercel.app', 'http://localhost:3000']
+}));
 app.use(express.json());
 
 // Criar uma tarefa
@@ -105,7 +107,7 @@ app.delete("/tasks/:id", async (req, res) => {
         return res.status(400).json("Id é Obrigatório");
     }
 
-    const tasksAlreadyExist = await prisma.task.findUnique({where: { id: intId} });
+    const tasksAlreadyExist = await prisma.task.findUnique({ where: { id: intId } });
 
     if (!tasksAlreadyExist) {
         return res.status(404).json("tarefa não existe");
@@ -115,4 +117,7 @@ app.delete("/tasks/:id", async (req, res) => {
     res.json({ message: "Tarefa deletada" });
 });
 
-app.listen(3001, () => console.log("Server running on port 3001"));
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+    console.log(`Servidor rodando na porta ${PORT}`);
+});
