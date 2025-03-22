@@ -1,33 +1,48 @@
 const express = require('express')
 const { PrismaClient } = require("@prisma/client");
 const cors = require("cors");
-
+const authMiddleware = require('./middleware/auth');
+require('dotenv').config();
 
 const app = express();
 const prisma = new PrismaClient();
-
+const PORT = process.env.PORT || 3001;
 
 app.use(cors({
     origin: ['https://tarefas-frontend-bice.vercel.app', 'http://localhost:3000'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     credentials: true
-  }));
+}));
 app.use(express.json());
+
+// Aplicar middleware de autenticação em todas as rotas
+app.use(authMiddleware);
+
+// Rotas
+app.use('/auth', require('./routes/authRoutes'));
+app.use('/tasks', require('./routes/taskRoutes'));
 
 app.get('/', (req, res) => {
     res.json({ message: 'API do Gerenciador de Tarefas funcionando!' });
-  });
+});
 
 // Criar uma tarefa
 app.post("/tasks", async (req, res) => {
     const { title, description, dateTime } = req.body;
-    const task = await prisma.task.create({ data: { title, description, dateTime: dateTime ? new Date(dateTime) : null, } });
+    const task = await prisma.task.create({ data: { title, description, dateTime: dateTime ? new Date(dateTime) : null, userId: req.user.userId } });
     res.json(task);
 });
 
 // Buscar todas as tarefas
 app.get("/tasks", async (req, res) => {
-    const tasks = await prisma.task.findMany();
+    const tasks = await prisma.task.findMany({
+        where: {
+            userId: req.user.userId
+        },
+        orderBy: {
+            status: 'asc'
+        }
+    });
     res.json(tasks);
 });
 
@@ -58,7 +73,6 @@ app.put("/tasks/:id", async (req, res) => {
         res.status(500).json({ error: "Erro ao atualizar a tarefa." });
     }
 });
-
 
 app.patch("/tasks/:id/complete", async (req, res) => {
     const { id } = req.params;
@@ -100,9 +114,6 @@ app.patch("/tasks/:id/toggle-status", async (req, res) => {
     }
 });
 
-
-
-
 // Deletar uma tarefa
 app.delete("/tasks/:id", async (req, res) => {
     const { id } = req.params;
@@ -123,7 +134,6 @@ app.delete("/tasks/:id", async (req, res) => {
     res.json({ message: "Tarefa deletada" });
 });
 
-const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
     console.log(`Servidor rodando na porta ${PORT}`);
 });
