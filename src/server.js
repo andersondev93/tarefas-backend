@@ -14,6 +14,10 @@ app.use(cors({
   }));
 app.use(express.json());
 
+app.get('/', (req, res) => {
+    res.json({ message: 'API do Gerenciador de Tarefas funcionando!' });
+  });
+
 // Criar uma tarefa
 app.post("/tasks", async (req, res) => {
     const { title, description, dateTime } = req.body;
