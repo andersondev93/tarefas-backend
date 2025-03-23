@@ -3,6 +3,8 @@ const { PrismaClient } = require("@prisma/client");
 const cors = require("cors");
 require('dotenv').config();
 
+// Primeiro declare a variável PORT
+const PORT = process.env.PORT || 3001;
 
 const app = express();
 const prisma = new PrismaClient();
@@ -20,11 +22,11 @@ app.use('/auth', require('./routes/authRoutes'));
 app.use('/tasks', require('./routes/taskRoutes'));
 
 app.get('/', (req, res) => {
-  res.json({ message: 'API do Gerenciador de Tarefas' });
+    res.json({ message: 'API do Gerenciador de Tarefas' });
 });
 
 app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
+    console.log(`Servidor rodando na porta ${PORT}`);
 });
 
 
@@ -131,9 +133,4 @@ app.delete("/tasks/:id", async (req, res) => {
 
     await prisma.task.delete({ where: { id: intId } });
     res.json({ message: "Tarefa deletada" });
-});
-
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-    console.log(`Servidor rodando na porta ${PORT}`);
 });
